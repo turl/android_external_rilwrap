@@ -5,6 +5,7 @@
 #include <cutils/properties.h>
 #include <telephony/ril.h>
 #include <utils/Log.h>
+#include "rilwrap.h"
 
 /* Wrapped RIL_env functions */
 void (*OnRequestComplete_wrapee) (RIL_Token, RIL_Errno, void *, size_t);
@@ -15,7 +16,11 @@ void (*RequestTimedCallback_wrapee) (RIL_TimedCallback, void *, const struct tim
 void OnRequestComplete_wrapper (RIL_Token t, RIL_Errno e,
 	void *response, size_t responselen)
 {
-	LOGV("OnRequestComplete");
+	/* Debug code */
+	RequestInfo *pRI = (RequestInfo *)t;
+	LOGV("OnRequestComplete token='%u' errno='%u' responselen='%u'",
+		pRI->token, e, responselen);
+
 	/* Call the orig function */
 	OnRequestComplete_wrapee(t, e, response, responselen);
 }
@@ -23,7 +28,10 @@ void OnRequestComplete_wrapper (RIL_Token t, RIL_Errno e,
 void OnUnsolicitedResponse_wrapper (int unsolResponse, const void *data,
 	size_t datalen)
 {
-	LOGV("OnUnsolicitedResponse %d", unsolResponse);
+	/* Debug code */
+	LOGV("OnUnsolicitedResponse unsolResponse='%d' datalen='%u'",
+		unsolResponse, datalen);
+
 	/* Call the orig function */
 	OnUnsolicitedResponse_wrapee(unsolResponse, data, datalen);
 }
@@ -31,17 +39,15 @@ void OnUnsolicitedResponse_wrapper (int unsolResponse, const void *data,
 void RequestTimedCallback_wrapper (RIL_TimedCallback callback,
 	void *param, const struct timeval *relativeTime)
 {
-	LOGV("RequestTimedCallback");
+	/* Debug code */
+	LOGV("RequestTimedCallback relativeTime='%lu'",
+		(relativeTime->tv_sec * 1000) + (relativeTime->tv_usec / 1000));
+
 	/* Call the orig function */
 	RequestTimedCallback_wrapee(callback, param, relativeTime);
 }
 
 /* Wrapped RIL_RadioFunctions functions */
-/*void (*RIL_RequestFunc_wrapee) (int, void *, size_t, RIL_Token);
-RIL_RadioState (*RIL_RadioStateRequest_wrapee) ();
-int (*RIL_Supports_wrapee) (int);
-void (*RIL_Cancel_wrapee) (RIL_Token);
-const char * (*RIL_GetVersion_wrapee) (void);*/
 RIL_RequestFunc RIL_RequestFunc_wrapee;
 RIL_RadioStateRequest RIL_RadioStateRequest_wrapee;
 RIL_Supports RIL_Supports_wrapee;
@@ -51,28 +57,38 @@ RIL_GetVersion RIL_GetVersion_wrapee;
 /* RIL_RadioFunctions wrappers */
 void RIL_RequestFunc_wrapper (int request, void *data, size_t datalen, RIL_Token t)
 {
-	LOGV("RIL_RequestFunc");
+	/* Debug code */
+	RequestInfo *pRI = (RequestInfo *)t;
+	LOGV("RIL_RequestFunc request='%d' datalen='%u' token='%u'",
+		request, datalen, pRI->token);
 	/* Call the orig function */
 	RIL_RequestFunc_wrapee(request, data, datalen, t);
 }
 
 RIL_RadioState RIL_RadioStateRequest_wrapper (int argc, char *argv[])
 {
+	/* Debug code */
 	LOGV("RIL_RadioStateRequest");
+
 	/* Call the orig function */
 	return RIL_RadioStateRequest_wrapee(argc, argv);
 }
 
 int RIL_Supports_wrapper (int requestCode)
 {
-	LOGV("RIL_Supports");
+	/* Debug code */
+	LOGV("RIL_Supports requestCode='%d'", requestCode);
+
 	/* Call the orig function */
 	return RIL_Supports_wrapee(requestCode);
 }
 
 void RIL_Cancel_wrapper (RIL_Token t)
 {
-	LOGV("RIL_Cancel");
+	/* Debug code */
+	RequestInfo *pRI = (RequestInfo *)t;
+	LOGV("RIL_Cancel token='%d'", pRI->token);
+
 	/* Call the orig function */
 	return RIL_Cancel_wrapee(t);
 }
