@@ -6,6 +6,7 @@
 #include <telephony/ril.h>
 #include <utils/Log.h>
 #include "rilwrap.h"
+#include "rilthreads.h"
 
 /* Wrapped RIL_env functions */
 void (*OnRequestComplete_wrapee) (RIL_Token, RIL_Errno, void *, size_t);
@@ -151,6 +152,9 @@ const RIL_RadioFunctions *RIL_Init (const struct RIL_Env *env, int argc, char **
 	RIL_RadioFunctions_wrap.supports = RIL_Supports_wrapper;
 	RIL_RadioFunctions_wrap.onCancel = RIL_Cancel_wrapper;
 	RIL_RadioFunctions_wrap.getVersion = RIL_GetVersion_wrapper;
+
+	LOGV("Initializing threads!");
+	RIL_startThreads(&RIL_RadioFunctions_wrap, &RIL_Env_wrap);
 
 	LOGV("RIL_Init wrapper returning!");
 
