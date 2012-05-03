@@ -7,6 +7,7 @@
 #include <utils/Log.h>
 #include "rilwrap.h"
 #include "rilthreads.h"
+#include "multicast.h"
 
 /* Wrapped RIL_env functions */
 void (*OnRequestComplete_wrapee) (RIL_Token, RIL_Errno, void *, size_t);

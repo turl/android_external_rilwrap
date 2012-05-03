@@ -7,6 +7,7 @@
 #include <telephony/ril.h>
 #include <utils/Log.h>
 #include "rilthreads.h"
+#include "multicast.h"
 
 void RIL_startThreads(void *param1, void *param2)
 {
